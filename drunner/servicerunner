@@ -77,10 +77,14 @@ function main {
 
          #--- custom commands
 
-         run)
-            docker run --name ${SERVICENAME}-myjenkins -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" jenkins
+         start)
+            #docker run --name ${SERVICENAME}-myjenkins -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" jenkins
+            docker start --name ${SERVICENAME} -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" jenkins
             # "${SERVICENAME}" "${IMAGENAME}"
             ;;
+
+         stop)
+            docker stop ${SERVICENAME}
 
          #--- unrecognised commands
 
