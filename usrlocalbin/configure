@@ -40,4 +40,9 @@ fi
 
 mv /tmp/s3 /config/upload.sh
 echo "S3 configuration updated."
+
+if [ ! -e /var/jenkins_home/configured ]; then
+   cp -a /tocopy/* /var
+fi
+
 exit 0

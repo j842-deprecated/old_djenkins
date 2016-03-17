@@ -28,7 +28,7 @@ NAME
    ${SERVICENAME}
 
 SYNOPSIS
-   ${CODE_S}$BUCKET=... S3KEY=... S3SECRET=... ${SERVICENAME} configure${CODE_E}
+   ${CODE_S}BUCKET=... S3KEY=... S3SECRET=... ${SERVICENAME} configure${CODE_E}
       set up upload script
 
    ${CODE_S}${SERVICENAME} start${CODE_E}
@@ -62,6 +62,8 @@ function main {
    fi
 
    COMMAND="${1}"
+   shift
+   
    case "$COMMAND" in
 
           #--- standard (required) commands
@@ -92,15 +94,15 @@ function main {
          #--- custom commands
 
          configure)
-         if [ -z "${S3KEY}" ]; then showhelp ; die "Missing S3KEY." ; fi
-         if [ -z "${S3SECRET}" ]; then showhelp ; die "Missing S3SECRET." ; fi
-         if [ -z "${BUCKET}" ]; then showhelp ; die "Missing BUCKET." ; fi
+            if [ -z "${S3KEY}" ]; then showhelp ; die "Missing S3KEY." ; fi
+            if [ -z "${S3SECRET}" ]; then showhelp ; die "Missing S3SECRET." ; fi
+            if [ -z "${BUCKET}" ]; then showhelp ; die "Missing BUCKET." ; fi
 
-         docker run -it --name="${SERVICENAME}-${COMMAND}" -h "${HOSTNAME}" -e "S3KEY=${S3KEY}" -e "S3SECRET=${S3SECRET}" -e "BUCKET=${BUCKET}" "${DOCKEROPTS[@]}" "${IMAGENAME}" configure "$@"
-         local RVAL=$?
-         docker rm "${SERVICENAME}-${COMMAND}" >/dev/null
-         if [ $RVAL -ne 0 ]; then die "${SERVICENAME} ${COMMAND} failed." ; fi
-         ;;
+            docker run -it --name="${SERVICENAME}-${COMMAND}" -h "${HOSTNAME}" -e "S3KEY=${S3KEY}" -e "S3SECRET=${S3SECRET}" -e "BUCKET=${BUCKET}" "${DOCKEROPTS[@]}" "${IMAGENAME}" configure "$@"
+            local RVAL=$?
+            docker rm "${SERVICENAME}-${COMMAND}" >/dev/null
+            if [ $RVAL -ne 0 ]; then die "${SERVICENAME} ${COMMAND} failed." ; fi
+            ;;
 
          start)
             #docker run --name ${SERVICENAME}-myjenkins -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" jenkins
@@ -111,6 +113,26 @@ function main {
          stop)
             docker stop ${SERVICENAME}
             docker rm ${SERVICENAME}
+            ;;
+
+         export)
+            [ "$#" -eq 1 ] || die "Export requires one argument (the path to export to)."
+            local DESTPATH=$(realpath "$1" | tr -d '\r\n')
+            [ -d "$DESTPATH" ] || die "Please create the path first, e.g. ${CODE_S}mkdir -p ${1}${CODE_E}"
+            ! container_running "${SERVICENAME}" || die "Can't export while ${SERVICENAME} is started. Stop it first with ${CODE_S}${SERVICENAME} stop${CODE_E}"
+
+            utils_export "/var/jenkins_home" "$DESTPATH"
+            echo "Exported world to $DESTPATH."
+            ;;
+
+         import)
+            [ "$#" -eq 1 ] || die "Import requires one argument (the path to to be imported)."
+            local SOURCEPATH=$(realpath "$1" | tr -d '\r\n')
+            [ -d "$SOURCEPATH" ] || die "Path does not exist: $SOURCEPATH"
+            ! container_running "${SERVICENAME}" || die "Can't import while ${SERVICENAME} is started. Stop it first."
+
+            utils_import "$SOURCEPATH" "/var/jenkins_home"
+            echo "Imported from $SOURCEPATH."
             ;;
 
          #--- unrecognised commands
