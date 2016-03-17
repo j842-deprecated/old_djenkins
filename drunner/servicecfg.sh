@@ -8,7 +8,7 @@
 # e.g.
 # VOLUMES=("/config" "/data")
 
-VOLUMES=("/var/jenkins_home")
+VOLUMES=("/var/jenkins_home" "/config")
 
 # Additional containers used by the service. Only set when we have
 # multiple containers (e.g. database container...)

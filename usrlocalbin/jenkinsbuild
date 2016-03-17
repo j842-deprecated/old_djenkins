@@ -1,0 +1,9 @@
+#!/bin/bash
+
+git clone https://github.com/drunner/drunner.git
+cd drunner
+chmod -R u+x *
+make permissions
+chmod -R u+x *
+make upload
+

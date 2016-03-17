@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function die {
+  echo "$1"
+  exit 1
+}
+
+
+[ "$#" -gt 0 ] || die "Needs argument!"
+
+  path="./$1"
+  aws_path="/$1"
+
+  include /config/upload.sh
+
+  [-v BUCKET] || die "Undefined: BUCKET"
+  [-v S3KEY]  || die "Undefined: S3KEY"
+  [-v S3SECRET] || die "Underfined: S3SECRET"
+
+
+  date="$(LC_ALL=C date -u +"%a, %d %b %Y %X %z")"
+  md5="$(openssl md5 -binary < "${path}" | base64)"
+  content_type='application/x-compressed-tar'
+  string="PUT\n\n${content_type}\n${date}\n/${BUCKET}${aws_path}"
+  signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
+  curl -X PUT -T "${path}" \
+    -H "Host: ${BUCKET}.s3.amazonaws.com" \
+    -H "Date: ${date}" \
+    -H "Content-Type: ${content_type}" \
+    -H "Authorization: AWS ${S3KEY}:${signature}" \
+     "https://drunner.s3-ap-southeast-2.amazonaws.com${aws_path}"
+#    "https://${BUCKET}.s3.amazonaws.com${aws_path}"
+
+
+  if [ $? -ne 0 ]; then
+     echo "Upload failed!"
+     exit 1
+  fi
+
+  echo "Uploaded $1"
+

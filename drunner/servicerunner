@@ -28,14 +28,17 @@ NAME
    ${SERVICENAME}
 
 SYNOPSIS
-   ${CODE_S}${SERVICENAME} help${CODE_E}
-      This help.
+   ${CODE_S}$BUCKET=... S3KEY=... S3SECRET=... ${SERVICENAME} configure${CODE_E}
+      set up upload script
 
-   ${CODE_S}${SERVICENAME} run${CODE_E}
-      Say hello to the world.
+   ${CODE_S}${SERVICENAME} start${CODE_E}
+      Start Jenkins. Connect over port 8080.
+
+   ${CODE_S}${SERVICENAME} stop${CODE_E}
+      Stop Jenkins.
 
 DESCRIPTION
-   A simple dRunner example. Built from ${IMAGENAME}.
+   A simple jenkins dService for building dRunner.
 
 EOF
 }
@@ -68,17 +71,38 @@ function main {
             ;;
 
          enter)
-            docker exec -it jenkins /bin/bash
+            docker exec -it ${SERVICENAME} /bin/bash
             ;;
 
          selftest)
             ;;
 
+         obliterate_start)
+            docker stop ${SERVICENAME} 2>&1
+            docker rm ${SERVICENAME} 2>&1
+            ;;
+
+         uninstall_start)
+            docker stop ${SERVICENAME} 2>&1
+            docker rm ${SERVICENAME} 2>&1
+            ;;
+
          #--- custom commands
+
+         configure)
+         [-v BUCKET] || die "Undefined: BUCKET"
+         [-v S3KEY]  || die "Undefined: S3KEY"
+         [-v S3SECRET] || die "Underfined: S3SECRET"
+         cat <<EOF >/config/upload.sh
+BUCKET=${BUCKET}
+S3KEY=${S3KEY}
+S3SECRET=${S3SECRET}"
+EOF
+         ;;
 
          start)
             #docker run --name ${SERVICENAME}-myjenkins -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" jenkins
-            docker run -d --name ${SERVICENAME} -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" jenkins
+            docker run -d --name ${SERVICENAME} -p 8080:8080 -p 50000:50000 "${DOCKEROPTS[@]}" j842/djenkins
             # "${SERVICENAME}" "${IMAGENAME}"
             ;;
 
