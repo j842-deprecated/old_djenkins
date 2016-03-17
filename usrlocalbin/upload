@@ -11,11 +11,11 @@ function die {
   path="./$1"
   aws_path="/$1"
 
-  include /config/upload.sh
+  source /config/upload.sh
 
-  [-v BUCKET] || die "Undefined: BUCKET"
-  [-v S3KEY]  || die "Undefined: S3KEY"
-  [-v S3SECRET] || die "Underfined: S3SECRET"
+  [-z "${BUCKET}""] || die "Undefined: BUCKET"
+  [-z "${S3KEY}"]  || die "Undefined: S3KEY"
+  [-z "${S3SECRET}"] || die "Underfined: S3SECRET"
 
 
   date="$(LC_ALL=C date -u +"%a, %d %b %Y %X %z")"
@@ -38,4 +38,3 @@ function die {
   fi
 
   echo "Uploaded $1"
-
