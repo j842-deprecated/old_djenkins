@@ -11,5 +11,3 @@ USER jenkins
 
 ADD ["./drunner","/drunner"]
 ADD ["./usrlocalbin","/usr/local/bin"]
-ADD ["./tocopy","/tocopy"]
-
