@@ -15,8 +15,8 @@
 
 set -o nounset
 MYDIR=$( dirname "$(readlink -f "$0")" )
-source "$MYDIR/variables.sh"
 source "$MYDIR/utils.sh"
+cd $MYDIR
 
 #------------------------------------------------------------------------------------
 # showhelp - give some info about the service. SERVICENAME and IMAGENAME are provided by variables.sh.
@@ -57,8 +57,7 @@ function dockerrun {
 # The main function. We can add any commands we'd like here!
 
 function stopjenkins {
-   docker stop ${SERVICENAME} 2>&1
-   docker rm ${SERVICENAME} 2>&1
+   docker-compose -p "${SERVICENAME}" down
 }
 
 
@@ -102,43 +101,38 @@ function main {
             if [ -z "${S3SECRET}" ]; then showhelp ; die "Missing S3SECRET." ; fi
             if [ -z "${BUCKET}" ]; then showhelp ; die "Missing BUCKET." ; fi
 
-            docker run -it --name="${SERVICENAME}-${COMMAND}" \
-               -h "${HOSTNAME}" -e "S3KEY=${S3KEY}" \
-               -e "S3SECRET=${S3SECRET}" -e "BUCKET=${BUCKET}" \
-               "${DOCKEROPTS[@]}" "${IMAGENAME}" s3configure "$@"
-            local RVAL=$?
-            docker rm "${SERVICENAME}-${COMMAND}" >/dev/null
-            if [ $RVAL -ne 0 ]; then die "${SERVICENAME} ${COMMAND} failed." ; fi
+            save_environment "S3KEY" "${S3KEY}"
+            save_environment "S3SECRET" "${S3SECRET}"
+            save_environment "BUCKET" "${BUCKET}"
             ;;
 
          start)
-            docker run -d --name ${SERVICENAME} -p 8080:8080 -p 50000:50000 \
-               "${DOCKEROPTS[@]}" j842/djenkins
+            docker-compose -p "${SERVICENAME}" up -d
             ;;
 
          stop)
             stopjenkins
             ;;
 
-         export)
-            [ "$#" -eq 1 ] || die "Export requires one argument (the path to export to)."
-            local DESTPATH=$(realpath "$1" | tr -d '\r\n')
-            [ -d "$DESTPATH" ] || die "Please create the path first, e.g. ${CODE_S}mkdir -p ${1}${CODE_E}"
-            ! container_running "${SERVICENAME}" || die "Can't export while ${SERVICENAME} is started. Stop it first with ${CODE_S}${SERVICENAME} stop${CODE_E}"
-
-            utils_export "/var/jenkins_home" "$DESTPATH"
-            echo "Exported Jenkins home to $DESTPATH."
-            ;;
-
-         import)
-            [ "$#" -eq 1 ] || die "Import requires one argument (the path to to be imported)."
-            local SOURCEPATH=$(realpath "$1" | tr -d '\r\n')
-            [ -d "$SOURCEPATH" ] || die "Path does not exist: $SOURCEPATH"
-            ! container_running "${SERVICENAME}" || die "Can't import while ${SERVICENAME} is started. Stop it first."
-
-            utils_import "$SOURCEPATH" "/var/jenkins_home"
-            echo "Imported Jenkins home from $SOURCEPATH."
-            ;;
+         # export)
+         #    [ "$#" -eq 1 ] || die "Export requires one argument (the path to export to)."
+         #    local DESTPATH=$(realpath "$1" | tr -d '\r\n')
+         #    [ -d "$DESTPATH" ] || die "Please create the path first, e.g. ${CODE_S}mkdir -p ${1}${CODE_E}"
+         #    ! container_running "${SERVICENAME}" || die "Can't export while ${SERVICENAME} is started. Stop it first with ${CODE_S}${SERVICENAME} stop${CODE_E}"
+         #
+         #    utils_export "/var/jenkins_home" "$DESTPATH"
+         #    echo "Exported Jenkins home to $DESTPATH."
+         #    ;;
+         #
+         # import)
+         #    [ "$#" -eq 1 ] || die "Import requires one argument (the path to to be imported)."
+         #    local SOURCEPATH=$(realpath "$1" | tr -d '\r\n')
+         #    [ -d "$SOURCEPATH" ] || die "Path does not exist: $SOURCEPATH"
+         #    ! container_running "${SERVICENAME}" || die "Can't import while ${SERVICENAME} is started. Stop it first."
+         #
+         #    utils_import "$SOURCEPATH" "/var/jenkins_home"
+         #    echo "Imported Jenkins home from $SOURCEPATH."
+         #    ;;
 
          #--- unrecognised commands
 
