@@ -4,8 +4,13 @@ MAINTAINER j842
 
 USER root
 
-RUN apt-get update && apt-get -y install build-essential g++-multilib libboost-all-dev && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get -y install bc libyaml-cpp-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get -y install \
+   build-essential \
+   g++-multilib \
+   libboost-all-dev \
+   bc \
+   libyaml-cpp-dev \
+   && rm -rf /var/lib/apt/lists/*
 
 ADD ["./usrlocalbin","/usr/local/bin"]
 RUN chmod a+rx /usr/local/bin/*

@@ -5,6 +5,7 @@ services:
       image: j842/djenkins
       volumes:
          - "jenkins_home:/var/jenkins_home"
+         - "config:/config"
       ports:
          - "8080:8080"
          - "50000:50000"
@@ -15,3 +16,6 @@ volumes:
    jenkins_home:
       external:
          name: "drunner-${SERVICENAME}-varjenkinshome"
+   config:
+      external:
+         name: "drunner-${SERVICENAME}-config"
