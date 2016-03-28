@@ -5,17 +5,17 @@ services:
       image: j842/djenkins
       volumes:
          - "jenkins_home:/var/jenkins_home"
-         - "config:/config"
       ports:
          - "8080:8080"
          - "50000:50000"
       restart: always
       network_mode: "bridge"
+      environment:
+         - S3KEY
+         - S3SECRET
+         - BUCKET
 
 volumes:
    jenkins_home:
       external:
          name: "drunner-${SERVICENAME}-varjenkinshome"
-   config:
-      external:
-         name: "drunner-${SERVICENAME}-config"

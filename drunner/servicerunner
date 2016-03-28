@@ -101,13 +101,9 @@ function main {
             [[ -v S3SECRET ]] || { showhelp ; die "Missing S3SECRET." ; }
             [[ -v BUCKET ]] || { showhelp ; die "Missing BUCKET." ; }
 
-            docker run -it --name="${SERVICENAME}-${COMMAND}" \
-                           -e "S3KEY=${S3KEY}" -e "S3SECRET=${S3SECRET}" -e "BUCKET=${BUCKET}" \
-                           -v "drunner-${SERVICENAME}-config:/config" \
-                           "${IMAGENAME}" s3configure "$@"
-            local RVAL=$?
-            docker rm "${SERVICENAME}-${COMMAND}" >/dev/null
-            #if [ $RVAL -ne 0 ]; then die "${SERVICENAME} ${COMMAND} failed." ; fi
+            save_environment "S3KEY" "${S3KEY}"
+            save_environment "S3SECRET" "${S3SECRET}"
+            save_environment "BUCKET" "${BUCKET}"
             ;;
 
          start)
