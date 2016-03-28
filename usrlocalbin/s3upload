@@ -11,7 +11,7 @@ function die {
 path="./$1"
 aws_path="/$1"
 
-source /config/upload.sh
+#source /config/upload.sh
 
 [ -v BUCKET ] || die "Undefined: BUCKET";
 [ -v S3KEY ] || die "Undefined: S3KEY";
