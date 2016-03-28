@@ -14,4 +14,4 @@ services:
 volumes:
    jenkins_home:
       external:
-         name: "drunner-${SERVICENAME}-varjenkins_home"
+         name: "drunner-${SERVICENAME}-varjenkinshome"
