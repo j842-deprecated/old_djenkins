@@ -97,9 +97,9 @@ function main {
          #--- custom commands
 
          configure)
-            if [ -z "${S3KEY}" ]; then showhelp ; die "Missing S3KEY." ; fi
-            if [ -z "${S3SECRET}" ]; then showhelp ; die "Missing S3SECRET." ; fi
-            if [ -z "${BUCKET}" ]; then showhelp ; die "Missing BUCKET." ; fi
+            [[ -v S3KEY ]] || { showhelp ; die "Missing S3KEY." ; }
+            [[ -v S3SECRET ]] || { showhelp ; die "Missing S3SECRET." ; }
+            [[ -v BUCKET ]] || { showhelp ; die "Missing BUCKET." ; }
 
             save_environment "S3KEY" "${S3KEY}"
             save_environment "S3SECRET" "${S3SECRET}"
@@ -107,6 +107,7 @@ function main {
             ;;
 
          start)
+            [[ -v S3KEY ]] || { die "Run configure before trying to start jenkins." ; }
             docker-compose -p "${SERVICENAME}" up -d
             ;;
 
