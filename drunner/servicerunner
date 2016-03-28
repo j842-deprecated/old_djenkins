@@ -78,7 +78,7 @@ function main {
             ;;
 
          enter)
-            docker exec -it ${SERVICENAME} /bin/bash
+            docker exec -it ${SERVICENAME}_djenkins_1 /bin/bash
             ;;
 
          selftest)
@@ -107,11 +107,10 @@ function main {
                            "${IMAGENAME}" s3configure "$@"
             local RVAL=$?
             docker rm "${SERVICENAME}-${COMMAND}" >/dev/null
-            if [ $RVAL -ne 0 ]; then die "${SERVICENAME} ${COMMAND} failed." ; fi
+            #if [ $RVAL -ne 0 ]; then die "${SERVICENAME} ${COMMAND} failed." ; fi
             ;;
 
          start)
-            [[ -v S3KEY ]] || { die "Run configure before trying to start jenkins." ; }
             docker-compose -p "${SERVICENAME}" up -d
             ;;
 
