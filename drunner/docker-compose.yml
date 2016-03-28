@@ -4,7 +4,6 @@ services:
    djenkins:
       image: j842/djenkins
       volumes:
-         - "config:/config"
          - "jenkins_home:/var/jenkins_home"
       ports:
          - "8080:8080"
