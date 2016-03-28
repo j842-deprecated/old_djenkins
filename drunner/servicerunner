@@ -113,27 +113,7 @@ function main {
          stop)
             stopjenkins
             ;;
-
-         # export)
-         #    [ "$#" -eq 1 ] || die "Export requires one argument (the path to export to)."
-         #    local DESTPATH=$(realpath "$1" | tr -d '\r\n')
-         #    [ -d "$DESTPATH" ] || die "Please create the path first, e.g. ${CODE_S}mkdir -p ${1}${CODE_E}"
-         #    ! container_running "${SERVICENAME}" || die "Can't export while ${SERVICENAME} is started. Stop it first with ${CODE_S}${SERVICENAME} stop${CODE_E}"
-         #
-         #    utils_export "/var/jenkins_home" "$DESTPATH"
-         #    echo "Exported Jenkins home to $DESTPATH."
-         #    ;;
-         #
-         # import)
-         #    [ "$#" -eq 1 ] || die "Import requires one argument (the path to to be imported)."
-         #    local SOURCEPATH=$(realpath "$1" | tr -d '\r\n')
-         #    [ -d "$SOURCEPATH" ] || die "Path does not exist: $SOURCEPATH"
-         #    ! container_running "${SERVICENAME}" || die "Can't import while ${SERVICENAME} is started. Stop it first."
-         #
-         #    utils_import "$SOURCEPATH" "/var/jenkins_home"
-         #    echo "Imported Jenkins home from $SOURCEPATH."
-         #    ;;
-
+            
          #--- unrecognised commands
 
          *)
