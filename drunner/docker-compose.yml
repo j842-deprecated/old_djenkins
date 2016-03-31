@@ -4,7 +4,7 @@ services:
    djenkins:
       image: j842/djenkins
       volumes:
-         - "jenkins_home:/var/jenkins_home"
+         - "drunner_jenkins_home:/var/jenkins_home"
       ports:
          - "8080:8080"
          - "50000:50000"
@@ -16,6 +16,6 @@ services:
          - BUCKET
 
 volumes:
-   jenkins_home:
+   drunner_jenkins_home:
       external:
          name: "drunner-${SERVICENAME}-varjenkinshome"
