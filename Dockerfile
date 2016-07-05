@@ -7,7 +7,6 @@ USER root
 RUN apt-get update && apt-get -y install \
    build-essential \
    g++-multilib \
-   libboost-all-dev \
    bc \
    libyaml-cpp-dev \
    libpoco-dev \
